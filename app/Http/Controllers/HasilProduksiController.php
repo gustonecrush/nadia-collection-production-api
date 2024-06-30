@@ -11,12 +11,7 @@ class HasilProduksiController extends Controller
     public function index()
     {
         $hasilProduksis = HasilProduksi::all();
-        return view('hasil_produksis.index', compact('hasilProduksis'));
-    }
-
-    public function create()
-    {
-        return view('hasil_produksis.create');
+        return response()->json($hasilProduksis);
     }
 
     public function store(Request $request)
@@ -32,7 +27,7 @@ class HasilProduksiController extends Controller
 
         $filePath = $request->file('file_foto_produk')->store('hasil_produksi_images', 'public');
 
-        HasilProduksi::create([
+        $hasilProduksi = HasilProduksi::create([
             'nama' => $request->nama,
             'harga' => $request->harga,
             'tanggal_produksi' => $request->tanggal_produksi,
@@ -41,22 +36,16 @@ class HasilProduksiController extends Controller
             'file_foto_produk' => $filePath,
         ]);
 
-        return redirect()->route('hasil-produksis.index')->with('success', 'Hasil Produksi created successfully.');
+        return response()->json(['message' => 'Hasil Produksi created successfully.', 'hasilProduksi' => $hasilProduksi], 201);
     }
 
     public function show($id)
     {
         $hasilProduksi = HasilProduksi::findOrFail($id);
-        return view('hasil_produksis.show', compact('hasilProduksi'));
+        return response()->json($hasilProduksi);
     }
 
-    public function edit($id)
-    {
-        $hasilProduksi = HasilProduksi::findOrFail($id);
-        return view('hasil_produksis.edit', compact('hasilProduksi'));
-    }
-
-    public function update(Request $request, $id)
+    public function updateHasilProduksi(Request $request, $id)
     {
         $request->validate([
             'nama' => 'required|string|max:255',
@@ -84,7 +73,7 @@ class HasilProduksiController extends Controller
             'penanggung_jawab' => $request->penanggung_jawab,
         ]);
 
-        return redirect()->route('hasil-produksis.index')->with('success', 'Hasil Produksi updated successfully.');
+        return response()->json(['message' => 'Hasil Produksi updated successfully.', 'hasilProduksi' => $hasilProduksi]);
     }
 
     public function destroy($id)
@@ -95,6 +84,6 @@ class HasilProduksiController extends Controller
 
         $hasilProduksi->delete();
 
-        return redirect()->route('hasil-produksis.index')->with('success', 'Hasil Produksi deleted successfully.');
+        return response()->json(['message' => 'Hasil Produksi deleted successfully.']);
     }
 }

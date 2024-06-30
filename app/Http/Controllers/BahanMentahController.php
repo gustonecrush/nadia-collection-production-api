@@ -12,13 +12,7 @@ class BahanMentahController extends Controller
     public function index()
     {
         $bahanMentahs = BahanMentah::with('supplier')->get();
-        return view('bahan_mentahs.index', compact('bahanMentahs'));
-    }
-
-    public function create()
-    {
-        $suppliers = Supplier::all();
-        return view('bahan_mentahs.create', compact('suppliers'));
+        return response()->json($bahanMentahs);
     }
 
     public function store(Request $request)
@@ -34,7 +28,7 @@ class BahanMentahController extends Controller
 
         $filePath = $request->file('file_gambar')->store('bahan_mentah_images', 'public');
 
-        BahanMentah::create([
+        $bahanMentah = BahanMentah::create([
             'supplier_id' => $request->supplier_id,
             'nama' => $request->nama,
             'kuantitas' => $request->kuantitas,
@@ -43,23 +37,16 @@ class BahanMentahController extends Controller
             'file_gambar' => $filePath,
         ]);
 
-        return redirect()->route('bahan_mentahs.index')->with('success', 'Bahan Mentah created successfully.');
+        return response()->json(['message' => 'Bahan Mentah created successfully.', 'bahanMentah' => $bahanMentah], 201);
     }
 
     public function show($id)
     {
         $bahanMentah = BahanMentah::with('supplier')->findOrFail($id);
-        return view('bahan_mentahs.show', compact('bahanMentah'));
+        return response()->json($bahanMentah);
     }
 
-    public function edit($id)
-    {
-        $bahanMentah = BahanMentah::findOrFail($id);
-        $suppliers = Supplier::all();
-        return view('bahan_mentahs.edit', compact('bahanMentah', 'suppliers'));
-    }
-
-    public function update(Request $request, $id)
+    public function updateBahanMentah(Request $request, $id)
     {
         $request->validate([
             'supplier_id' => 'required|exists:suppliers,id',
@@ -87,7 +74,7 @@ class BahanMentahController extends Controller
             'harga' => $request->harga,
         ]);
 
-        return redirect()->route('bahan_mentahs.index')->with('success', 'Bahan Mentah updated successfully.');
+        return response()->json(['message' => 'Bahan Mentah updated successfully.', 'bahanMentah' => $bahanMentah]);
     }
 
     public function destroy($id)
@@ -98,6 +85,6 @@ class BahanMentahController extends Controller
 
         $bahanMentah->delete();
 
-        return redirect()->route('bahan_mentahs.index')->with('success', 'Bahan Mentah deleted successfully.');
+        return response()->json(['message' => 'Bahan Mentah deleted successfully.']);
     }
 }
